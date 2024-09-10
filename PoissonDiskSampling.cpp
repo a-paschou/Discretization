@@ -98,6 +98,7 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 		double newRadius{ boundary->CalculateLength() / nEdges };
 		for (size_t i = 0; i <= nEdges; i++)
 		{
+			std::vector<int>&& segment{};
 			if (i == 0)
 			{
 				if (currentBoundary == 0)
@@ -128,7 +129,12 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 
 				pair<int, int>* newPair = new pair<int, int>[2] {previousPosition, currentPosition};
 				//outerBoundaryEdges.push_back(make_pair(previousNodeID, currentNodeID));
-				grid.segments.push_back(make_pair(previousNodeID, currentNodeID));
+				//grid.segments.push_back(make_pair(previousNodeID, currentNodeID));
+				
+				segment.push_back(previousNodeID);
+				segment.push_back(currentNodeID);
+				grid.segments.push_back(segment);
+
 				previousNodeID = currentNodeID;
 				auxOuterBoundaryEdges->push_back(newPair);
 				previousPosition = currentPosition;
@@ -148,7 +154,12 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 
 					pair<int, int>* newPair = new pair<int, int>[2] {previousPosition, currentPosition};
 					//outerBoundaryEdges.push_back(make_pair(previousNodeID, currentNodeID));
-					grid.segments.push_back(make_pair(previousNodeID, currentNodeID));
+					//grid.segments.push_back(make_pair(previousNodeID, currentNodeID));
+
+					segment.push_back(previousNodeID);
+					segment.push_back(currentNodeID);
+					grid.segments.push_back(segment);
+
 					auxOuterBoundaryEdges->push_back(newPair);
 					previousNodeID = currentNodeID;
 					previousPosition = currentPosition;
@@ -156,7 +167,12 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 				else
 				{
 					//outerBoundaryEdges.push_back(make_pair(previousNodeID, initialNodeID));
-					grid.segments.push_back(make_pair(previousNodeID, initialNodeID));
+					//grid.segments.push_back(make_pair(previousNodeID, initialNodeID));
+
+					segment.push_back(previousNodeID);
+					segment.push_back(initialNodeID);
+					grid.segments.push_back(segment);
+
 					pair<int, int>* newPair = new pair<int, int>[2] {previousPosition, initialPosition};
 					auxOuterBoundaryEdges->push_back(newPair);
 				}
@@ -166,7 +182,7 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 	}
 	if (CheckBoundaryDirection(0, grid.segments.size() - 1))
 	{
-		ReorderBoundaryEdgesDirection(0, outerBoundaryEdges.size() - 1);
+		ReorderBoundaryEdgesDirection(0, grid.segments.size() - 1);
 	}
 
 	int firstBoundariesEdge{};
@@ -185,6 +201,7 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 			double newRadius{ boundary->CalculateLength() / nEdges };
 			for (size_t i = 0; i <= nEdges; i++)
 			{
+				std::vector<int>&& segment{};
 				if (i == 0)
 				{
 					if (currentBoundary == 0)
@@ -215,7 +232,12 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 
 					pair<int, int>* newPair = new pair<int, int>[2] {previousPosition, currentPosition};
 					//innerBoundaryEdges.push_back(make_pair(previousNodeID, currentNodeID));
-					grid.segments.push_back(make_pair(previousNodeID, currentNodeID));
+					//grid.segments.push_back(make_pair(previousNodeID, currentNodeID));
+
+					segment.push_back(previousNodeID);
+					segment.push_back(currentNodeID);
+					grid.segments.push_back(segment);
+
 					previousNodeID = currentNodeID;
 					auxInnerBoundaryEdges->push_back(newPair);
 					previousPosition = currentPosition;
@@ -234,7 +256,12 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 
 						pair<int, int>* newPair = new pair<int, int>[2] {previousPosition, currentPosition};
 						//innerBoundaryEdges.push_back(make_pair(previousNodeID, currentNodeID));
-						grid.segments.push_back(make_pair(previousNodeID, currentNodeID));
+						//grid.segments.push_back(make_pair(previousNodeID, currentNodeID));
+
+						segment.push_back(previousNodeID);
+						segment.push_back(currentNodeID);
+						grid.segments.push_back(segment);
+
 						auxInnerBoundaryEdges->push_back(newPair);
 						previousNodeID = currentNodeID;
 						previousPosition = currentPosition;
@@ -242,7 +269,12 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 					else
 					{
 						//innerBoundaryEdges.push_back(make_pair(previousNodeID, initialNodeID));
-						grid.segments.push_back(make_pair(previousNodeID, initialNodeID));
+						//grid.segments.push_back(make_pair(previousNodeID, initialNodeID));
+
+						segment.push_back(previousNodeID);
+						segment.push_back(initialNodeID);
+						grid.segments.push_back(segment);
+
 						pair<int, int>* newPair = new pair<int, int>[2] {previousPosition, initialPosition};
 						auxInnerBoundaryEdges->push_back(newPair);
 					}
@@ -360,12 +392,13 @@ bool PoissonDiskSampling::CheckCollisionWithBoundaries(std::vector<pair<int, int
 }
 
 // Determines whether the points are in clockwise (true) or counter-clockwise (false) order.
+//https://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
 bool PoissonDiskSampling::CheckBoundaryDirection(int firstEdge, int lastEdge)
 {
 	double sum{ 0 };
 	for (size_t i = firstEdge; i <= lastEdge; i++)
 	{
-		sum += (vertices.at(grid.segments.at(i).second).first - vertices.at(grid.segments.at(i).first).first) * (vertices.at(grid.segments.at(i).second).second + vertices.at(grid.segments.at(i).first).second);
+		sum += (vertices.at(grid.segments.at(i).at(1)).first - vertices.at(grid.segments.at(i).at(0)).first) * (vertices.at(grid.segments.at(i).at(1)).second + vertices.at(grid.segments.at(i).at(0)).second);
 	}
 	if (sum > 0)
 	{
@@ -383,10 +416,14 @@ void PoissonDiskSampling::ReorderBoundaryEdgesDirection(int firstEdge, int lastE
 	int temp{};
 	for (size_t i = firstEdge; i <= lastEdge; i++)
 	{
-		temp = grid.segments.at(i).first;
+		temp = grid.segments.at(i).at(0);
+		//temp = grid.segments.at(i).first;
 		//boundary->at(i).first = boundary->at(i).second;
 		//boundary->at(i).second = temp;
-		grid.segments.at(i).first = grid.segments.at(i).second;
-		grid.segments.at(i).second = temp;
+		grid.segments.at(i).at(0) = grid.segments.at(i).at(1);
+		grid.segments.at(i).at(1) = temp;
+
+		//grid.segments.at(i).first = grid.segments.at(i).second;
+		//grid.segments.at(i).second = temp;
 	}
 }

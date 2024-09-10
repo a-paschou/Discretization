@@ -10,7 +10,7 @@ private:
 	//std::vector<int*> elements;
 	//std::map<int, std::pair<double, double>>* vertices{ nullptr };
 
-	int* FinishEdge(std::pair<int, int>*);
+	int* FinishEdge(int*);
 	bool CheckSegmentsCollision(double*, double*, double*, double*);
 	void AddTriangle(int*, int*);
 	void PassSegments(std::vector<std::pair<int, int>>*, std::vector<std::pair<int, int>>*);

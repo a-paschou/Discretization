@@ -10,15 +10,19 @@ DelaunayTriangulation2D::DelaunayTriangulation2D(Grid* grid/*, std::vector<std::
     //PassVertices(vertices);
     //PassSegments(outerBoundaryEdges, innerBoundaryEdges);
     int elementID{ 0 };
-    std::pair<int, int>* edge{ nullptr };
-    std::pair<int, int>* edge2{ nullptr };
-    std::pair<int, int>* edge3{ nullptr };
-    edge = new std::pair<int, int>();
-    edge2 = new std::pair<int, int>();
-    edge3 = new std::pair<int, int>();
+    //std::pair<int, int>* edge{ nullptr };
+    //std::pair<int, int>* edge2{ nullptr };
+    //std::pair<int, int>* edge3{ nullptr };
+    //edge = new std::pair<int, int>();
+    //edge2 = new std::pair<int, int>();
+    //edge3 = new std::pair<int, int>();
+    int edge[2]{};
+    int edge2[2]{};
+    int edge3[2]{};
     while (this->grid->segments.size() > 0)
     {
-        edge[0] = std::make_pair(this->grid->segments[0].first, this->grid->segments[0].second);
+        edge[0] = this->grid->segments.at(0).at(0);
+        edge[1] = this->grid->segments.at(0).at(1);
         this->grid->segments.erase(grid->segments.begin());
         int* triangleVertices{ nullptr };
         triangleVertices = new int[3];
@@ -26,15 +30,11 @@ DelaunayTriangulation2D::DelaunayTriangulation2D(Grid* grid/*, std::vector<std::
         if (triangleVertices != nullptr)
         {
             AddTriangle(&elementID, triangleVertices);
-            edge2->first = this->grid->elementsMap.at(elementID - 1)->GetNodeID(2);
-            edge2->second = this->grid->elementsMap.at(elementID - 1)->GetNodeID(0);
-            edge3->first = this->grid->elementsMap.at(elementID - 1)->GetNodeID(1);
-            edge3->second = this->grid->elementsMap.at(elementID - 1)->GetNodeID(2);
+            edge2[0] = this->grid->elementsMap.at(elementID - 1)->GetNodeID(2);
+            edge2[1] = this->grid->elementsMap.at(elementID - 1)->GetNodeID(0);
+            edge3[0] = this->grid->elementsMap.at(elementID - 1)->GetNodeID(1);
+            edge3[1] = this->grid->elementsMap.at(elementID - 1)->GetNodeID(2);
 
-            //edge2->first = grid.elements.at(elementID - 1)[2];
-            //edge2->second = grid.elements.at(elementID - 1)[0];
-            //edge3->first = grid.elements.at(elementID - 1)[1];
-            //edge3->second = grid.elements.at(elementID - 1)[2];
             bool flagEdge2{ false };
             bool flagEdge3{ false };
             int positionEdge2{ 0 };
@@ -43,7 +43,7 @@ DelaunayTriangulation2D::DelaunayTriangulation2D(Grid* grid/*, std::vector<std::
             {
                 if (!flagEdge2)
                 {
-                    if ((this->grid->segments.at(i).first == edge2->first && this->grid->segments.at(i).second == edge2->second) || (this->grid->segments.at(i).first == edge2->second && this->grid->segments.at(i).second == edge2->first))
+                    if ((this->grid->segments.at(i).at(0) == edge2[0] && this->grid->segments.at(i).at(1) == edge2[1]) || (this->grid->segments.at(i).at(0) == edge2[1] && this->grid->segments.at(i).at(1) == edge2[0]))
                     {
                         flagEdge2 = true;
                         positionEdge2 = i;
@@ -51,7 +51,7 @@ DelaunayTriangulation2D::DelaunayTriangulation2D(Grid* grid/*, std::vector<std::
                 }
                 if (!flagEdge3)
                 {
-                    if ((this->grid->segments.at(i).first == edge3->first && this->grid->segments.at(i).second == edge3->second) || (this->grid->segments.at(i).first == edge3->second && this->grid->segments.at(i).second == edge3->first))
+                    if ((this->grid->segments.at(i).at(0) == edge3[0] && this->grid->segments.at(i).at(1) == edge3[1]) || (this->grid->segments.at(i).at(0) == edge3[1] && this->grid->segments.at(i).at(1) == edge3[0]))
                     {
                         flagEdge3 = true;
                         positionEdge3 = i;
@@ -77,29 +77,27 @@ DelaunayTriangulation2D::DelaunayTriangulation2D(Grid* grid/*, std::vector<std::
             }
             if (!flagEdge2)
             {
-                int temp1{ edge2->first };
-                int temp2{ edge2->second };
-                edge2->first = temp2;
-                edge2->second = temp1;
-                this->grid->segments.push_back(*edge2);
+                int temp1{ edge2[0] };
+                int temp2{ edge2[1] };
+                std::vector<int>&& segment{temp2, temp1};
+                this->grid->segments.push_back(segment);
             }
             if (!flagEdge3)
             {
-                int temp1{ edge3->first };
-                int temp2{ edge3->second };
-                edge3->first = temp2;
-                edge3->second = temp1;
-                this->grid->segments.push_back(*edge3);
+                int temp1{ edge3[0] };
+                int temp2{ edge3[1] };
+                std::vector<int>&& segment{ temp2, temp1 };
+                this->grid->segments.push_back(segment);
             }
         }
     }
 }
 
-int* DelaunayTriangulation2D::FinishEdge(std::pair<int, int>* edge)
+int* DelaunayTriangulation2D::FinishEdge(int* edge)
 {
     int points[3]{};
-    points[0] = edge->first;
-    points[1] = edge->second;
+    points[0] = edge[0];
+    points[1] = edge[1];
 
     double* coors{ nullptr };
     coors = new double[8];
@@ -147,16 +145,16 @@ int* DelaunayTriangulation2D::FinishEdge(std::pair<int, int>* edge)
                 bool flag{ true };
                 for (auto &edgeVertices: grid->segments)
                 {
-                    if (it->first == edgeVertices.first || it->first == edgeVertices.second)
+                    if (it->first == edgeVertices[0] || it->first == edgeVertices[1])
                     {
                         continue;
                     }
                     double segmentPointStart[2]{ 0,0 };
                     double segmentPointEnd[2]{ 0,0 };
-                    segmentPointStart[0] = grid->nodesMap.at(edgeVertices.first)->GetX();
-                    segmentPointStart[1] = grid->nodesMap.at(edgeVertices.first)->GetY();
-                    segmentPointEnd[0] =grid->nodesMap.at(edgeVertices.second)->GetX();
-                    segmentPointEnd[1] = grid->nodesMap.at(edgeVertices.second)->GetY();
+                    segmentPointStart[0] = grid->nodesMap.at(edgeVertices[0])->GetX();
+                    segmentPointStart[1] = grid->nodesMap.at(edgeVertices[0])->GetY();
+                    segmentPointEnd[0] =grid->nodesMap.at(edgeVertices[1])->GetX();
+                    segmentPointEnd[1] = grid->nodesMap.at(edgeVertices[1])->GetY();
                     if (CheckSegmentsCollision(segmentPointStart, segmentPointEnd, midPoint, tryCoors))
                     {
                         flag = false;
@@ -249,29 +247,6 @@ void DelaunayTriangulation2D::AddTriangle(int* elementID, int* points)
     pointsIDs[2] = point2;
     this->grid->elementsMap[*elementID] = new CST(*elementID, pointsIDs);
     *elementID = *elementID + 1;
-}
-
-void DelaunayTriangulation2D::PassSegments(std::vector<std::pair<int, int>>* outerBoundaryEdges, std::vector<std::pair<int, int>>* innerBoundaryEdges)
-{
-    std::pair<int, int> newEdge{};
-    for (const auto edge : *outerBoundaryEdges)
-    {
-        newEdge = std::make_pair(edge.first, edge.second);
-        grid->segments.push_back(newEdge);
-    }
-    for (const auto edge : *innerBoundaryEdges)
-    {
-        newEdge = std::make_pair(edge.first, edge.second);
-        grid->segments.push_back(newEdge);
-    }
-}
-
-void DelaunayTriangulation2D::PassVertices(std::map<int, std::pair<double, double>>* vertices)
-{
-    for (auto &vertice : *vertices)
-    {
-        grid->nodesMap[vertice.first] = new Node(vertice.first, vertice.second.first, vertice.second.second);
-    }
 }
 
 double DelaunayTriangulation2D::Orient(double* coors)

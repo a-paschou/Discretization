@@ -24,8 +24,6 @@ public:
 	Grid* PassGrid();
 
 	map<int, pair<double, double>> vertices;
-	std::vector<int> outerBoundaryVertices;
-	std::vector<int> innerBoundaryVertices;
 	std::vector<pair<int, int>> outerBoundaryEdges;
 	std::vector<pair<int, int>> innerBoundaryEdges;
 };
