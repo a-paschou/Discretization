@@ -46,8 +46,8 @@ PoissonDiskSampling::PoissonDiskSampling(Surface* surface, double radius, int nA
 				continue;
 			}
 			auxNodesMap[make_pair((int)(floor(newCoor[0] / cellSize)), (int)(floor(newCoor[1] / cellSize)))] = new double[2] {newCoor[0], newCoor[1]};
-			vertices[nodeID] = make_pair(newCoor[0], newCoor[1]);
-			grid.nodesMap[nodeID] = new Node(nodeID, newCoor[0], newCoor[1]);
+			//vertices[nodeID] = make_pair(newCoor[0], newCoor[1]);
+			//grid.nodesMap[nodeID] = new Node(nodeID, newCoor[0], newCoor[1]);
 			nodeID++;
 			activeNodes.push_back(new double[2] { newCoor[0], newCoor[1] });
 			found = true;
@@ -69,7 +69,7 @@ PoissonDiskSampling::PoissonDiskSampling(Surface* surface, double radius, int nA
 	//	std::cout << it2->second.first << " " << it2->second.second << std::endl;
 	//}
 
-
+	LexicoGraphicNodeGeneration(&auxNodesMap, &auxOuterBoundaryEdges, &auxInnerBoundaryEdges);
 	auxNodesMap.clear();
 	auxOuterBoundaryEdges.clear();
 	auxInnerBoundaryEdges.clear();
@@ -107,11 +107,11 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 					currentPosition = make_pair(floor(coor[0] / cellSize), floor(coor[1] / cellSize));
 					//outerBoundaryNodes.push_back(&currentPosition);
 					(*auxNodesMap)[currentPosition] = new double[2] { coor[0], coor[1] };
-					vertices[*nodeID] = make_pair(coor[0], coor[1]);
-					grid.nodesMap[*nodeID] = new Node(*nodeID, coor[0], coor[1]);
-					previousNodeID = *nodeID;
-					initialNodeID = *nodeID;
-					*nodeID += 1;
+					//vertices[*nodeID] = make_pair(coor[0], coor[1]);
+					//grid.nodesMap[*nodeID] = new Node(*nodeID, coor[0], coor[1]);
+					//previousNodeID = *nodeID;
+					//initialNodeID = *nodeID;
+					//*nodeID += 1;
 					previousPosition = currentPosition;
 					initialPosition = previousPosition;
 				}
@@ -122,18 +122,18 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 				currentPosition = make_pair(floor(coor[0] / cellSize), floor(coor[1] / cellSize));
 
 				(*auxNodesMap)[currentPosition] = new double[2] { coor[0], coor[1] };
-				currentNodeID = *nodeID;
-				vertices[currentNodeID] = make_pair(coor[0], coor[1]);
-				grid.nodesMap[*nodeID] = new Node(*nodeID, coor[0], coor[1]);
-				*nodeID += 1;
+				//currentNodeID = *nodeID;
+				//vertices[currentNodeID] = make_pair(coor[0], coor[1]);
+				//grid.nodesMap[*nodeID] = new Node(*nodeID, coor[0], coor[1]);
+				//*nodeID += 1;
 
 				pair<int, int>* newPair = new pair<int, int>[2] {previousPosition, currentPosition};
 				//outerBoundaryEdges.push_back(make_pair(previousNodeID, currentNodeID));
 				//grid.segments.push_back(make_pair(previousNodeID, currentNodeID));
 				
-				segment.push_back(previousNodeID);
-				segment.push_back(currentNodeID);
-				grid.segments.push_back(segment);
+				//segment.push_back(previousNodeID);
+				//segment.push_back(currentNodeID);
+				//grid.segments.push_back(segment);
 
 				previousNodeID = currentNodeID;
 				auxOuterBoundaryEdges->push_back(newPair);
@@ -147,18 +147,18 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 					currentPosition = make_pair(floor(coor[0] / cellSize), floor(coor[1] / cellSize));
 
 					(*auxNodesMap)[currentPosition] = new double[2] { coor[0], coor[1] };
-					currentNodeID = *nodeID;
-					vertices[currentNodeID] = make_pair(coor[0], coor[1]);
-					grid.nodesMap[*nodeID] = new Node(*nodeID, coor[0], coor[1]);
-					*nodeID += 1;
+					//currentNodeID = *nodeID;
+					//vertices[currentNodeID] = make_pair(coor[0], coor[1]);
+					//grid.nodesMap[*nodeID] = new Node(*nodeID, coor[0], coor[1]);
+					//*nodeID += 1;
 
 					pair<int, int>* newPair = new pair<int, int>[2] {previousPosition, currentPosition};
 					//outerBoundaryEdges.push_back(make_pair(previousNodeID, currentNodeID));
 					//grid.segments.push_back(make_pair(previousNodeID, currentNodeID));
 
-					segment.push_back(previousNodeID);
-					segment.push_back(currentNodeID);
-					grid.segments.push_back(segment);
+					//segment.push_back(previousNodeID);
+					//segment.push_back(currentNodeID);
+					//grid.segments.push_back(segment);
 
 					auxOuterBoundaryEdges->push_back(newPair);
 					previousNodeID = currentNodeID;
@@ -169,9 +169,9 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 					//outerBoundaryEdges.push_back(make_pair(previousNodeID, initialNodeID));
 					//grid.segments.push_back(make_pair(previousNodeID, initialNodeID));
 
-					segment.push_back(previousNodeID);
-					segment.push_back(initialNodeID);
-					grid.segments.push_back(segment);
+					//segment.push_back(previousNodeID);
+					//segment.push_back(initialNodeID);
+					//grid.segments.push_back(segment);
 
 					pair<int, int>* newPair = new pair<int, int>[2] {previousPosition, initialPosition};
 					auxOuterBoundaryEdges->push_back(newPair);
@@ -180,9 +180,9 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 		}
 		currentBoundary++;
 	}
-	if (CheckBoundaryDirection(0, grid.segments.size() - 1))
+	if (CheckBoundaryDirection(auxNodesMap, auxOuterBoundaryEdges, 0, auxOuterBoundaryEdges->size() - 1))
 	{
-		ReorderBoundaryEdgesDirection(0, grid.segments.size() - 1);
+		ReorderBoundaryEdgesDirection(auxOuterBoundaryEdges, 0, auxOuterBoundaryEdges->size() - 1);
 	}
 
 	int firstBoundariesEdge{};
@@ -194,7 +194,7 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 		pair<int, int> previousPosition{};
 		int currentNodeID{ *nodeID };
 		int previousNodeID{};
-		firstBoundariesEdge = grid.segments.size();
+		firstBoundariesEdge = auxInnerBoundaryEdges->size();
 		for (IShape* boundary : *boundaries)
 		{
 			int nEdges{ (int)(floor(boundary->CalculateLength() / radius)) };
@@ -210,11 +210,11 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 						currentPosition = make_pair(floor(coor[0] / cellSize), floor(coor[1] / cellSize));
 
 						(*auxNodesMap)[currentPosition] = new double[2] { coor[0], coor[1] };;
-						vertices[*nodeID] = make_pair(coor[0], coor[1]);
-						grid.nodesMap[*nodeID] = new Node(*nodeID, coor[0], coor[1]);
-						previousNodeID = *nodeID;
-						initialNodeID = *nodeID;
-						*nodeID += 1;
+						//vertices[*nodeID] = make_pair(coor[0], coor[1]);
+						//grid.nodesMap[*nodeID] = new Node(*nodeID, coor[0], coor[1]);
+						//previousNodeID = *nodeID;
+						//initialNodeID = *nodeID;
+						//*nodeID += 1;
 						previousPosition = currentPosition;
 						initialPosition = previousPosition;
 					}
@@ -226,17 +226,17 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 
 					(*auxNodesMap)[currentPosition] = new double[2] { coor[0], coor[1] };
 					currentNodeID = *nodeID;
-					vertices[currentNodeID] = make_pair(coor[0], coor[1]);
-					grid.nodesMap[*nodeID] = new Node(*nodeID, coor[0], coor[1]);
-					*nodeID += 1;
+					//vertices[currentNodeID] = make_pair(coor[0], coor[1]);
+					//grid.nodesMap[*nodeID] = new Node(*nodeID, coor[0], coor[1]);
+					//*nodeID += 1;
 
 					pair<int, int>* newPair = new pair<int, int>[2] {previousPosition, currentPosition};
 					//innerBoundaryEdges.push_back(make_pair(previousNodeID, currentNodeID));
 					//grid.segments.push_back(make_pair(previousNodeID, currentNodeID));
 
-					segment.push_back(previousNodeID);
-					segment.push_back(currentNodeID);
-					grid.segments.push_back(segment);
+					//segment.push_back(previousNodeID);
+					//segment.push_back(currentNodeID);
+					//grid.segments.push_back(segment);
 
 					previousNodeID = currentNodeID;
 					auxInnerBoundaryEdges->push_back(newPair);
@@ -249,18 +249,18 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 						coor = boundary->GetEndPoint();
 						currentPosition = make_pair(floor(coor[0] / cellSize), floor(coor[1] / cellSize));
 						(*auxNodesMap)[currentPosition] = new double[2] { coor[0], coor[1] };;
-						currentNodeID = *nodeID;
-						vertices[currentNodeID] = make_pair(coor[0], coor[1]);
-						grid.nodesMap[*nodeID] = new Node(*nodeID, coor[0], coor[1]);
-						*nodeID += 1;
+						//currentNodeID = *nodeID;
+						//vertices[currentNodeID] = make_pair(coor[0], coor[1]);
+						//grid.nodesMap[*nodeID] = new Node(*nodeID, coor[0], coor[1]);
+						//*nodeID += 1;
 
 						pair<int, int>* newPair = new pair<int, int>[2] {previousPosition, currentPosition};
 						//innerBoundaryEdges.push_back(make_pair(previousNodeID, currentNodeID));
 						//grid.segments.push_back(make_pair(previousNodeID, currentNodeID));
 
-						segment.push_back(previousNodeID);
-						segment.push_back(currentNodeID);
-						grid.segments.push_back(segment);
+						//segment.push_back(previousNodeID);
+						//segment.push_back(currentNodeID);
+						//grid.segments.push_back(segment);
 
 						auxInnerBoundaryEdges->push_back(newPair);
 						previousNodeID = currentNodeID;
@@ -271,9 +271,9 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 						//innerBoundaryEdges.push_back(make_pair(previousNodeID, initialNodeID));
 						//grid.segments.push_back(make_pair(previousNodeID, initialNodeID));
 
-						segment.push_back(previousNodeID);
-						segment.push_back(initialNodeID);
-						grid.segments.push_back(segment);
+						//segment.push_back(previousNodeID);
+						//segment.push_back(initialNodeID);
+						//grid.segments.push_back(segment);
 
 						pair<int, int>* newPair = new pair<int, int>[2] {previousPosition, initialPosition};
 						auxInnerBoundaryEdges->push_back(newPair);
@@ -282,9 +282,9 @@ void PoissonDiskSampling::DiscretizeBoundaries(Surface* surface, double radius, 
 			}
 			currentBoundary++;
 		}
-		if (!CheckBoundaryDirection(firstBoundariesEdge, grid.segments.size() - 1))
+		if (!CheckBoundaryDirection(auxNodesMap, auxInnerBoundaryEdges, firstBoundariesEdge, auxInnerBoundaryEdges->size() - 1))
 		{
-			ReorderBoundaryEdgesDirection(firstBoundariesEdge, grid.segments.size() - 1);
+			ReorderBoundaryEdgesDirection(auxInnerBoundaryEdges, firstBoundariesEdge, auxInnerBoundaryEdges->size() - 1);
 		}
 	}
 	delete[] coor;
@@ -393,12 +393,13 @@ bool PoissonDiskSampling::CheckCollisionWithBoundaries(std::vector<pair<int, int
 
 // Determines whether the points are in clockwise (true) or counter-clockwise (false) order.
 //https://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
-bool PoissonDiskSampling::CheckBoundaryDirection(int firstEdge, int lastEdge)
+bool PoissonDiskSampling::CheckBoundaryDirection(map<pair<int, int>, double*>* auxNodesMap, std::vector<std::pair<int, int>*>* auxBoundaryEdges, int firstEdge, int lastEdge)
 {
 	double sum{ 0 };
 	for (size_t i = firstEdge; i <= lastEdge; i++)
 	{
-		sum += (vertices.at(grid.segments.at(i).at(1)).first - vertices.at(grid.segments.at(i).at(0)).first) * (vertices.at(grid.segments.at(i).at(1)).second + vertices.at(grid.segments.at(i).at(0)).second);
+		sum += (auxNodesMap->at(auxBoundaryEdges->at(i)[1])[0] - auxNodesMap->at(auxBoundaryEdges->at(i)[0])[0]) * (auxNodesMap->at(auxBoundaryEdges->at(i)[1])[1] + auxNodesMap->at(auxBoundaryEdges->at(i)[0])[1]);
+		//sum += (vertices.at(grid.segments.at(i).at(1)).first - vertices.at(grid.segments.at(i).at(0)).first) * (vertices.at(grid.segments.at(i).at(1)).second + vertices.at(grid.segments.at(i).at(0)).second);
 	}
 	if (sum > 0)
 	{
@@ -411,19 +412,53 @@ bool PoissonDiskSampling::CheckBoundaryDirection(int firstEdge, int lastEdge)
 }
 
 // Interchanges the boundary's edges first and second vetice
-void PoissonDiskSampling::ReorderBoundaryEdgesDirection(int firstEdge, int lastEdge)
+void PoissonDiskSampling::ReorderBoundaryEdgesDirection(std::vector<std::pair<int, int>*>* auxBoundaryEdges, int firstEdge, int lastEdge)
 {
-	int temp{};
+	std::pair<int, int> temp{};
 	for (size_t i = firstEdge; i <= lastEdge; i++)
 	{
-		temp = grid.segments.at(i).at(0);
-		//temp = grid.segments.at(i).first;
-		//boundary->at(i).first = boundary->at(i).second;
-		//boundary->at(i).second = temp;
-		grid.segments.at(i).at(0) = grid.segments.at(i).at(1);
-		grid.segments.at(i).at(1) = temp;
+		//temp = grid.segments.at(i).at(0);
+		temp = auxBoundaryEdges->at(i)[0];
+		auxBoundaryEdges->at(i)[0] = auxBoundaryEdges->at(i)[1];
+		auxBoundaryEdges->at(i)[1] = temp;
+		//grid.segments.at(i).at(0) = grid.segments.at(i).at(1);
+		//grid.segments.at(i).at(1) = temp;
+	}
+}
 
-		//grid.segments.at(i).first = grid.segments.at(i).second;
-		//grid.segments.at(i).second = temp;
+void PoissonDiskSampling::LexicoGraphicNodeGeneration(map<pair<int, int>, double*>* auxNodesMap, std::vector<std::pair<int, int>*>* auxOuterBoundaryEdges, std::vector<std::pair<int, int>*>* auxInnerBoundaryEdges)
+{
+	int nodeID{};
+	double coorX;
+	double coorY;
+	auto it{ auxNodesMap->begin() };
+	for (it = auxNodesMap->begin(); it != auxNodesMap->end(); it++)
+	{
+		coorX = it->second[0];
+		coorY = it->second[1];
+		grid.nodesMap[nodeID] = new Node(nodeID, coorX, coorY);
+		nodeID++;
+	}
+
+	int id1{};
+	int id2{};
+	for (auto boundaryEdge : *auxOuterBoundaryEdges)
+	{
+		std::vector<int>&& segment{};
+		id1 = distance(auxNodesMap->begin(), auxNodesMap->find(boundaryEdge[0]));
+		id2 = distance(auxNodesMap->begin(), auxNodesMap->find(boundaryEdge[1]));
+		segment.push_back(id1);
+		segment.push_back(id2);
+		grid.segments.push_back(segment);
+	}
+
+	for (auto boundaryEdge : *auxInnerBoundaryEdges)
+	{
+		std::vector<int>&& segment{};
+		id1 = distance(auxNodesMap->begin(), auxNodesMap->find(boundaryEdge[0]));
+		id2 = distance(auxNodesMap->begin(), auxNodesMap->find(boundaryEdge[1]));
+		segment.push_back(id1);
+		segment.push_back(id2);
+		grid.segments.push_back(segment);
 	}
 }

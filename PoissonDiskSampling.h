@@ -8,23 +8,16 @@
 class PoissonDiskSampling
 {
 private:
-
-	//std::vector<double*> activeNodes;
-	//std::vector < pair<int, int>*> outerBoundaryNodes;
-	//std::vector<pair<int, int>*> innerBoundaryNodes;
 	Grid grid;
 
 	void DiscretizeBoundaries(Surface*, double, double, int*, std::vector<pair<int, int>*>*, std::vector<pair<int, int>*>*, map<pair<int, int>, double*>*);
 	bool IsValidPoint(Surface*, double*, double, double, int, int, std::vector<pair<int, int>*>*, std::vector<pair<int, int>*>*, map<pair<int, int>, double*>*);
 	bool CheckCollisionWithBoundaries(std::vector<pair<int, int>*>*, double*, double, map<pair<int, int>, double*>*);
-	bool CheckBoundaryDirection(int, int);
-	void ReorderBoundaryEdgesDirection(int, int);
+	bool CheckBoundaryDirection(map<pair<int, int>, double*>* , std::vector<std::pair<int,int>*>*, int, int);
+	void ReorderBoundaryEdgesDirection(std::vector<std::pair<int, int>*>*, int, int);
+	void LexicoGraphicNodeGeneration(map<pair<int, int>, double*>*, std::vector<std::pair<int, int>*>*, std::vector<std::pair<int, int>*>*);
 public:
 	PoissonDiskSampling(Surface*, double, int, int N = 2);
 	Grid* PassGrid();
-
-	map<int, pair<double, double>> vertices;
-	std::vector<pair<int, int>> outerBoundaryEdges;
-	std::vector<pair<int, int>> innerBoundaryEdges;
 };
 

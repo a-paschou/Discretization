@@ -3,7 +3,7 @@
 #include <iostream>
 #include "CST.h"
 
-DelaunayTriangulation2D::DelaunayTriangulation2D(Grid* grid/*, std::vector<std::pair<int, int>>* outerBoundaryEdges, std::vector<std::pair<int, int>>* innerBoundaryEdges*/)
+DelaunayTriangulation2D::DelaunayTriangulation2D(Grid* grid)
 {
     //grid.vertices = vertices;
     this->grid = grid;
@@ -23,7 +23,7 @@ DelaunayTriangulation2D::DelaunayTriangulation2D(Grid* grid/*, std::vector<std::
     {
         edge[0] = this->grid->segments.at(0).at(0);
         edge[1] = this->grid->segments.at(0).at(1);
-        this->grid->segments.erase(grid->segments.begin());
+        this->grid->segments.erase(grid->segments.begin() + 0);
         int* triangleVertices{ nullptr };
         triangleVertices = new int[3];
         triangleVertices = FinishEdge(edge);
@@ -79,15 +79,17 @@ DelaunayTriangulation2D::DelaunayTriangulation2D(Grid* grid/*, std::vector<std::
             {
                 int temp1{ edge2[0] };
                 int temp2{ edge2[1] };
-                std::vector<int>&& segment{temp2, temp1};
-                this->grid->segments.push_back(segment);
+                std::vector<int>&& segment{ temp2, temp1 };
+                this->grid->segments.insert(this->grid->segments.begin(), segment);
+                //this->grid->segments.push_back(segment);
             }
             if (!flagEdge3)
             {
                 int temp1{ edge3[0] };
                 int temp2{ edge3[1] };
                 std::vector<int>&& segment{ temp2, temp1 };
-                this->grid->segments.push_back(segment);
+                this->grid->segments.insert(this->grid->segments.begin(), segment);
+                //this->grid->segments.push_back(segment);
             }
         }
     }
@@ -245,7 +247,7 @@ void DelaunayTriangulation2D::AddTriangle(int* elementID, int* points)
     pointsIDs[0] = point0;
     pointsIDs[1] = point1;
     pointsIDs[2] = point2;
-    this->grid->elementsMap[*elementID] = new CST(*elementID, pointsIDs);
+    //this->grid->elementsMap[*elementID] = new CST(*elementID, pointsIDs);
     *elementID = *elementID + 1;
 }
 
