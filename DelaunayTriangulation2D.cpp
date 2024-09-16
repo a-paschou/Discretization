@@ -247,7 +247,7 @@ void DelaunayTriangulation2D::AddTriangle(int* elementID, int* points)
     pointsIDs[0] = point0;
     pointsIDs[1] = point1;
     pointsIDs[2] = point2;
-    //this->grid->elementsMap[*elementID] = new CST(*elementID, pointsIDs);
+    this->grid->elementsMap[*elementID] = new CST(*elementID, pointsIDs);
     *elementID = *elementID + 1;
 }
 
